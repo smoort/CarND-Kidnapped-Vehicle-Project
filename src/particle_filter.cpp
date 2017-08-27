@@ -27,7 +27,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 	//   x, y, theta and their uncertainties from GPS) and all weights to 1.
 	// Add random Gaussian noise to each particle.
 	// NOTE: Consult particle_filter.h for more information about this method (and others in this file).
-	ParticleFilter::num_particles = 333;
+	ParticleFilter::num_particles = 999;
 
 	default_random_engine gen;
 	double std_x, std_y, std_theta; // Standard deviations for x, y, and theta
@@ -91,16 +91,16 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 		      (velocity / yaw_rate) * (cos(p.theta * PI/180) - cos((p.theta + (yaw_rate * delta_t)) * PI/180)) +
 		      dist_y(gen);
 		p.theta = p.theta + (yaw_rate * delta_t) + dist_theta(gen);
-        */
+
 		p.x = (velocity / yaw_rate) * (sin((p.theta + (yaw_rate * delta_t))) - sin(p.theta)) + dist_x(gen);
 		p.y = (velocity / yaw_rate) * (cos(p.theta) - cos((p.theta + (yaw_rate * delta_t)))) + dist_y(gen);
 		p.theta = (yaw_rate * delta_t) + dist_theta(gen);
+        */
 
-        /*
         p.x += (velocity / yaw_rate) * (sin((p.theta + (yaw_rate * delta_t))) - sin(p.theta));
 		p.y += (velocity / yaw_rate) * (cos(p.theta) - cos((p.theta + (yaw_rate * delta_t))));
 		p.theta += (yaw_rate * delta_t);
-        */
+
 		temp_particles.push_back(p);
 	}
 	ParticleFilter::particles = temp_particles;
