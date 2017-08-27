@@ -34,6 +34,7 @@ int main()
   double sensor_range = 50; // Sensor range [m]
 
   double sigma_pos [3] = {0.3, 0.3, 0.01}; // GPS measurement uncertainty [x [m], y [m], theta [rad]]
+  //double sigma_pos [3] = {0.0, 0.0, 0.00}; // GPS measurement uncertainty [x [m], y [m], theta [rad]]
   double sigma_landmark [2] = {0.3, 0.3}; // Landmark measurement uncertainty [x [m], y [m]]
 
   // Read map data
@@ -127,7 +128,7 @@ int main()
 			}
 			weight_sum += particles[i].weight;
 		  }
-		  cout << "best particle = " << best_particle.x << ", " << best_particle.x << ", " << best_particle.theta << endl;
+		  cout << "best particle = " << best_particle.id << endl;
 		  cout << "highest w " << highest_weight << endl;
 		  cout << "average w " << weight_sum/num_particles << endl;
 
