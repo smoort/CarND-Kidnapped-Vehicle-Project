@@ -88,7 +88,7 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 		temp_particles.push_back(p);
 	}
 	ParticleFilter::particles = temp_particles;
-    cout << "Finishing Prediction" << endl;
+    // cout << "Finishing Prediction" << endl;
     return;
 }
 
@@ -163,7 +163,8 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 
         std::vector<LandmarkObs> associated_landmarks = dataAssociation(transformed_observations, inrange_landmarks);
 
-        double final_weight = 1;
+        double final_weight = 1.0;
+        ParticleFilter::max_weight = 0.0;
         for (int i = 0; i < transformed_observations.size(); ++i) {
 
           double x_var = pow((transformed_observations[i].x - associated_landmarks[i].x),2);
@@ -178,13 +179,19 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
           // calculate weight using normalization terms and exponent
           double weight = gauss_norm * exp(-exponent);
 
+          //cout << "weight = " << weight << endl;
+
           final_weight = final_weight * weight;
         }
         p.weight = final_weight;
 		temp_particles.push_back(p);
+		if (final_weight > max_weight) {
+            ParticleFilter::max_weight = final_weight;
+		}
 	}
 	ParticleFilter::particles = temp_particles;
-    cout << "Finishing updateWeights" << endl;
+	cout << "Best weight =" << ParticleFilter::max_weight << endl;
+    // cout << "Finishing updateWeights" << endl;
 }
 
 void ParticleFilter::resample() {
@@ -192,6 +199,27 @@ void ParticleFilter::resample() {
 	// NOTE: You may find std::discrete_distribution helpful here.
 	//   http://en.cppreference.com/w/cpp/numeric/random/discrete_distribution
 
+	std::random_device rd; // obtain a random number from hardware
+    std::mt19937 eng(rd()); // seed the generator
+    std::uniform_int_distribution<> distr(0, num_particles-1); // define the range
+    std::uniform_int_distribution<> beta_distr(0, 100); // define the range
+    int index = distr(eng);
+    double beta = 0.0;
+    cout << "index =" << index << endl;
+    std::vector<Particle> temp_particles;
+	for (int i = 0; i < num_particles; ++i) {
+        double beta_rand = beta_distr(eng) / 100.0;
+        beta = beta + (beta_rand * 2 * ParticleFilter::max_weight);
+        while(beta > ParticleFilter::particles[index].weight) {
+            beta = beta - ParticleFilter::particles[index].weight;
+            index = (index + 1) % num_particles;
+            cout << "index =" << index << endl;
+        }
+        Particle p = ParticleFilter::particles[index];
+        temp_particles.push_back(p);
+	}
+	ParticleFilter::particles = temp_particles;
+    // cout << "Finishing resample" << endl;
 }
 
 Particle ParticleFilter::SetAssociations(Particle particle, std::vector<int> associations, std::vector<double> sense_x, std::vector<double> sense_y)

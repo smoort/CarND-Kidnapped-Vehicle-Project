@@ -38,6 +38,9 @@ class ParticleFilter {
 	// Vector of weights of all particles
 	std::vector<double> weights;
 
+	// Variable to hold max weight
+	double max_weight;
+
 public:
 
 	// Set of current particles
