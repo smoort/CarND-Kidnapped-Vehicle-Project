@@ -70,36 +70,44 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 	 std_y = std_pos[1];
 	 std_theta = std_pos[2];
 
-
-
-
 	std::vector<Particle> temp_particles;
 	for (int i = 0; i < num_particles; ++i) {
         Particle p = ParticleFilter::particles[i];
 
         // Create a normal (Gaussian) distribution for x, y and theta
-        normal_distribution<double> dist_x(p.x, std_x);
-        normal_distribution<double> dist_y(p.y, std_y);
-        normal_distribution<double> dist_theta(p.theta, std_theta);
+        //normal_distribution<double> dist_x(p.x, std_x);
+        //normal_distribution<double> dist_y(p.y, std_y);
+        //normal_distribution<double> dist_theta(p.theta, std_theta);
 
-        /*
-		Particle p = ParticleFilter::particles[i];
-		p.x = p.x +
-		      (velocity / yaw_rate) * (sin((p.theta + (yaw_rate * delta_t)) * PI/180) - sin(p.theta * PI/180)) +
-		      dist_x(gen);
-		p.y = p.y +
-		      (velocity / yaw_rate) * (cos(p.theta * PI/180) - cos((p.theta + (yaw_rate * delta_t)) * PI/180)) +
-		      dist_y(gen);
-		p.theta = p.theta + (yaw_rate * delta_t) + dist_theta(gen);
-        */
-		p.x = (velocity / yaw_rate) * (sin((p.theta + (yaw_rate * delta_t))) - sin(p.theta)) + dist_x(gen);
-		p.y = (velocity / yaw_rate) * (cos(p.theta) - cos((p.theta + (yaw_rate * delta_t)))) + dist_y(gen);
-		p.theta = (yaw_rate * delta_t) + dist_theta(gen);
+        normal_distribution<double> dist_x(0.0, std_x);
+        normal_distribution<double> dist_y(0.0, std_y);
+        normal_distribution<double> dist_theta(0.0, std_theta);
 
+        if(abs(yaw_rate) > 1.0E-6) {
+            /*
+            Particle p = ParticleFilter::particles[i];
+            p.x = p.x +
+                (velocity / yaw_rate) * (sin((p.theta + (yaw_rate * delta_t)) * PI/180) - sin(p.theta * PI/180)) +
+                dist_x(gen);
+            p.y = p.y +
+                (velocity / yaw_rate) * (cos(p.theta * PI/180) - cos((p.theta + (yaw_rate * delta_t)) * PI/180)) +
+                dist_y(gen);
+            p.theta = p.theta + (yaw_rate * delta_t) + dist_theta(gen);
+            */
+            p.x = p.x + (velocity / yaw_rate) * (sin((p.theta + (yaw_rate * delta_t))) - sin(p.theta)) + dist_x(gen);
+            p.y = p.y + (velocity / yaw_rate) * (cos(p.theta) - cos((p.theta + (yaw_rate * delta_t)))) + dist_y(gen);
+            p.theta = p.theta + (yaw_rate * delta_t) + dist_theta(gen);
 
-        //p.x += (velocity / yaw_rate) * (sin((p.theta + (yaw_rate * delta_t))) - sin(p.theta));
-		//p.y += (velocity / yaw_rate) * (cos(p.theta) - cos((p.theta + (yaw_rate * delta_t))));
-		//p.theta += (yaw_rate * delta_t);
+            //p.x += (velocity / yaw_rate) * (sin((p.theta + (yaw_rate * delta_t))) - sin(p.theta));
+            //p.y += (velocity / yaw_rate) * (cos(p.theta) - cos((p.theta + (yaw_rate * delta_t))));
+            //p.theta += (yaw_rate * delta_t);
+        } else {
+            //p.x = velocity * (sin((p.theta + (delta_t))) - sin(p.theta)) + dist_x(gen);
+            //p.y = velocity * (cos(p.theta) - cos((p.theta + (delta_t)))) + dist_y(gen);
+            p.x = p.x + velocity * cos(p.theta)*delta_t + dist_x(gen);
+            p.y = p.y + velocity * sin(p.theta)*delta_t + dist_y(gen);
+            p.theta = p.theta + dist_theta(gen);
+        }
 
 		temp_particles.push_back(p);
 	}
