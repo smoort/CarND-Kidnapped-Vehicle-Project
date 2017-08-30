@@ -41,6 +41,7 @@ class ParticleFilter {
 	// Variable to hold max weight
 	double max_weight;
 
+
 public:
 
 	// Set of current particles
@@ -81,7 +82,7 @@ public:
 	 * @param predicted Vector of predicted landmark observations
 	 * @param observations Vector of landmark observations
 	 */
-	std::vector<LandmarkObs> dataAssociation(std::vector<LandmarkObs> predicted, std::vector<LandmarkObs> landmarks_list);
+	std::vector<LandmarkObs> dataAssociation(std::vector<LandmarkObs> predicted, std::vector<Map::single_landmark_s> landmark_list);
 
 	/**
 	 * updateWeights Updates the weights for each particle based on the likelihood of the
